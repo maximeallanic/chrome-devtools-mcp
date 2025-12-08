@@ -69,11 +69,11 @@ A powerful Chrome extension + MCP server that gives AI assistants (like Claude) 
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Clone and Install
 
 ```bash
 git clone https://github.com/maximeallanic/chrome-devtools-mcp.git
-cd chrome-devtools-mcp
+cd chrome-devtools-mcp/server
 npm install
 ```
 
@@ -82,12 +82,13 @@ npm install
 1. Open Chrome and navigate to `chrome://extensions/`
 2. Enable **Developer mode** (toggle in top right)
 3. Click **Load unpacked**
-4. Select the `chrome-devtools-mcp` folder
+4. Select the `extension/` folder
 5. Note the Extension ID displayed
 
 ### 3. Start the MCP Server
 
 ```bash
+cd server
 npm start
 ```
 
@@ -102,7 +103,7 @@ Add to your Claude Code MCP settings (`~/.claude/settings.json`):
   "mcpServers": {
     "chrome-devtools": {
       "command": "node",
-      "args": ["/path/to/chrome-devtools-mcp/mcp-server.js"]
+      "args": ["/path/to/chrome-devtools-mcp/server/mcp-server.js"]
     }
   }
 }
@@ -352,23 +353,38 @@ The extension popup provides:
 
 ```
 chrome-devtools-mcp/
-├── mcp-server.js           # MCP server (Node.js)
-├── background.js           # Extension service worker
-├── popup.html/js           # Extension popup UI
-├── manifest.json           # Chrome extension manifest
-├── content-scripts/        # DOM utility scripts
-│   ├── dom-utilities.js
-│   ├── interaction.js
-│   ├── extraction.js
-│   └── observer.js
-├── debug-helper.js         # External extension debugging
-├── package.json
+├── extension/                  # Chrome Extension
+│   ├── manifest.json           # Extension manifest (v3)
+│   ├── background.js           # Service worker
+│   ├── popup.html/js           # Extension popup UI
+│   ├── debug-helper.js         # External extension debugging
+│   ├── icons/                  # Extension icons
+│   └── content-scripts/        # DOM utility scripts
+│       ├── dom-utilities.js
+│       ├── interaction.js
+│       ├── extraction.js
+│       └── observer.js
+│
+├── server/                     # MCP Server (Node.js)
+│   ├── mcp-server.js           # Main server
+│   ├── package.json            # Dependencies
+│   └── node_modules/
+│
+├── scripts/                    # Admin scripts
+│   ├── start-server.sh
+│   ├── stop-server.sh
+│   ├── install-service.sh      # Systemd service setup
+│   └── chrome-devtools-mcp.service
+│
+├── LICENSE
 └── README.md
 ```
 
 ### Running in Development
 
 ```bash
+cd server
+
 # Start server with auto-reload (if using nodemon)
 npm run dev
 

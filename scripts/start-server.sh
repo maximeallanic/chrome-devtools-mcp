@@ -1,7 +1,10 @@
 #!/bin/bash
 # Start Chrome DevTools MCP Server
 
-cd "$(dirname "$0")"
+SCRIPT_DIR="$(dirname "$0")"
+SERVER_DIR="$SCRIPT_DIR/../server"
+cd "$SERVER_DIR"
+
 LOG_FILE="/tmp/mcp-server.log"
 PID_FILE="/tmp/mcp-server.pid"
 

@@ -1,16 +1,17 @@
 #!/bin/bash
 # Install Chrome DevTools MCP Server as systemd service
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SERVICE_FILE="chrome-devtools-mcp.service"
 INSTALL_PATH="/etc/systemd/system/$SERVICE_FILE"
 
 echo "Installing Chrome DevTools MCP Server as systemd service..."
 
 # Stop any running instances
-./stop-server.sh 2>/dev/null || true
+"$SCRIPT_DIR/stop-server.sh" 2>/dev/null || true
 
 # Copy service file
-sudo cp "$SERVICE_FILE" "$INSTALL_PATH"
+sudo cp "$SCRIPT_DIR/$SERVICE_FILE" "$INSTALL_PATH"
 echo "✓ Service file copied to $INSTALL_PATH"
 
 # Reload systemd

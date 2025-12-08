@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Chrome DevTools MCP Custom</title>
+  <style>
+    body {
+      width: 450px;
+      padding: 15px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin: 0 0 15px 0;
+      color: #1a73e8;
+    }
+
+    .status {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    .status.connected {
+      background: #e6f4ea;
+      color: #137333;
+      border: 1px solid #137333;
+    }
+
+    .status.disconnected {
+      background: #fce8e6;
+      color: #c5221f;
+      border: 1px solid #c5221f;
+    }
+
+    .button {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: none;
+      border-radius: 5px;
+      background: #1a73e8;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .button:hover {
+      background: #1557b0;
+    }
+
+    .button:disabled {
+      background: #dadce0;
+      cursor: not-allowed;
+    }
+
+    .button.secondary {
+      background: #5f6368;
+    }
+
+    .button.secondary:hover {
+      background: #3c4043;
+    }
+
+    .section {
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 5px;
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #202124;
+    }
+
+    .tab-list {
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .tab-item {
+      background: white;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #dadce0;
+    }
+
+    .tab-info {
+      flex: 1;
+      overflow: hidden;
+      margin-right: 8px;
+    }
+
+    .tab-title {
+      font-weight: 500;
+      font-size: 12px;
+      color: #202124;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .tab-stats {
+      font-size: 11px;
+      color: #5f6368;
+      margin-top: 2px;
+    }
+
+    .tab-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .tab-btn {
+      padding: 4px 8px;
+      border: none;
+      border-radius: 3px;
+      font-size: 11px;
+      cursor: pointer;
+      background: #e8f0fe;
+      color: #1967d2;
+    }
+
+    .tab-btn:hover {
+      background: #d2e3fc;
+    }
+
+    .tab-btn.danger {
+      background: #fce8e6;
+      color: #c5221f;
+    }
+
+    .tab-btn.danger:hover {
+      background: #f6aea9;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 10px;
+      background: #f1f3f4;
+      border-radius: 5px;
+    }
+
+    .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #1a73e8;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #5f6368;
+      margin-top: 5px;
+    }
+
+    .info {
+      margin-top: 15px;
+      padding: 10px;
+      background: #e8f0fe;
+      border-radius: 5px;
+      font-size: 12px;
+      color: #1967d2;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #5f6368;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛠️ Chrome DevTools MCP</h1>
+
+  <div id="status" class="status disconnected">
+    <strong>MCP Server:</strong> <span id="status-text">Checking...</span>
+  </div>
+
+  <button id="attach-btn" class="button">Attach to Current Tab</button>
+  <button id="clear-btn" class="button secondary">Clear All Data</button>
+
+  <div class="section">
+    <div class="section-title">Attached Tabs (<span id="attached-count">0</span>)</div>
+    <div id="tab-list" class="tab-list">
+      <div class="empty-state">No tabs attached yet</div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-value" id="network-count">0</div>
+      <div class="stat-label">Network</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="console-count">0</div>
+      <div class="stat-label">Console</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="total-tabs">0</div>
+      <div class="stat-label">All Tabs</div>
+    </div>
+  </div>
+
+  <div class="info">
+    <strong>MCP Connected:</strong> <span id="mcp-status">Checking...</span>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "name": "chrome-devtools-mcp",
+  "version": "1.0.0",
+  "description": "Chrome DevTools MCP Server - Control Chrome browser via Model Context Protocol. Network monitoring, console logs, DOM manipulation, screenshots, and more.",
+  "type": "module",
+  "main": "mcp-server.js",
+  "bin": {
+    "chrome-devtools-mcp": "./mcp-server.js"
+  },
+  "scripts": {
+    "start": "node mcp-server.js"
+  },
+  "keywords": [
+    "mcp",
+    "chrome",
+    "devtools",
+    "model-context-protocol",
+    "browser-automation",
+    "web-scraping",
+    "claude",
+    "anthropic",
+    "ai-tools"
+  ],
+  "author": "Maxime Allanic <maxime@allanic.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maximeallanic/chrome-devtools-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/maximeallanic/chrome-devtools-mcp/issues"
+  },
+  "homepage": "https://github.com/maximeallanic/chrome-devtools-mcp#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "express": "^4.21.2"
+  }
+}

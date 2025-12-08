@@ -1,0 +1,50 @@
+{
+  "manifest_version": 3,
+  "name": "Chrome DevTools MCP Custom",
+  "version": "1.0.0",
+  "description": "Custom Chrome extension for DevTools access via MCP - Network monitoring, Console logs, Performance metrics",
+  "permissions": [
+    "debugger",
+    "tabs",
+    "activeTab",
+    "scripting",
+    "nativeMessaging",
+    "storage",
+    "downloads",
+    "management"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "content-scripts/dom-utilities.js",
+        "content-scripts/interaction.js",
+        "content-scripts/extraction.js",
+        "content-scripts/observer.js"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "externally_connectable": {
+    "ids": ["*"]
+  }
+}

@@ -1,0 +1,20 @@
+[Unit]
+Description=Chrome DevTools MCP Server
+After=network.target
+
+[Service]
+Type=simple
+User=mallanic
+WorkingDirectory=/home/mallanic/Projects/Personal/chrome-devtools-mcp-custom
+ExecStart=/home/mallanic/.nvm/versions/node/v20.19.5/bin/node /home/mallanic/Projects/Personal/chrome-devtools-mcp-custom/mcp-server.js
+Restart=always
+RestartSec=10
+StandardOutput=append:/tmp/mcp-server.log
+StandardError=append:/tmp/mcp-server.log
+
+# Environment
+Environment=NODE_ENV=production
+Environment=PATH=/home/mallanic/.nvm/versions/node/v20.19.5/bin:/usr/local/bin:/usr/bin:/bin
+
+[Install]
+WantedBy=multi-user.target

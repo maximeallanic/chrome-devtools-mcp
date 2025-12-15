@@ -456,8 +456,12 @@ async function detachDebugger(tabId) {
   sendToMcpServer('tab_detached', { tabId });
 }
 
+// Constants for body capture
+const MAX_BODY_SIZE = 50000; // 50KB max per body
+const CAPTURABLE_MIME_TYPES = ['json', 'text', 'xml', 'javascript', 'html'];
+
 // Handle debugger events
-chrome.debugger.onEvent.addListener((source, method, params) => {
+chrome.debugger.onEvent.addListener(async (source, method, params) => {
   const tabId = source.tabId;
   const tabData = attachedTabs.get(tabId);
 
@@ -473,16 +477,37 @@ chrome.debugger.onEvent.addListener((source, method, params) => {
         method: params.request.method,
         headers: params.request.headers,
         timestamp: params.timestamp,
-        type: params.type
+        type: params.type,
+        // Capture POST data if available
+        hasPostData: params.request.hasPostData || false,
+        postData: params.request.postData || null
       };
+
+      // If hasPostData but postData not directly available, fetch it
+      if (params.request.hasPostData && !networkData.postData) {
+        try {
+          const postDataResult = await chrome.debugger.sendCommand(
+            { tabId },
+            'Network.getRequestPostData',
+            { requestId: params.requestId }
+          );
+          networkData.postData = postDataResult.postData;
+          // Truncate if too large
+          if (networkData.postData && networkData.postData.length > MAX_BODY_SIZE) {
+            networkData.postData = networkData.postData.substring(0, MAX_BODY_SIZE);
+            networkData.postDataTruncated = true;
+          }
+        } catch (e) {
+          // POST data may not be available (e.g., for redirects)
+        }
+      }
+
       tabData.networkRequests.push(networkData);
 
       // Keep only last 1000 requests per tab
       if (tabData.networkRequests.length > 1000) {
         tabData.networkRequests = tabData.networkRequests.slice(-1000);
       }
-
-      sendToMcpServer('network', networkData);
       break;
 
     case 'Network.responseReceived':
@@ -494,7 +519,51 @@ chrome.debugger.onEvent.addListener((source, method, params) => {
           headers: params.response.headers,
           mimeType: params.response.mimeType
         };
-        sendToMcpServer('network', request);
+        // Don't send yet - wait for loadingFinished to capture body
+      }
+      break;
+
+    case 'Network.loadingFinished':
+      const finishedRequest = tabData.networkRequests.find(r => r.requestId === params.requestId);
+      if (finishedRequest) {
+        // Add timing info
+        finishedRequest.timing = {
+          duration: params.timestamp - finishedRequest.timestamp,
+          encodedDataLength: params.encodedDataLength
+        };
+
+        // Capture response body for text-based MIME types
+        if (finishedRequest.response) {
+          const mimeType = finishedRequest.response.mimeType || '';
+          const shouldCaptureBody = CAPTURABLE_MIME_TYPES.some(type => mimeType.includes(type));
+
+          if (shouldCaptureBody) {
+            try {
+              const bodyResult = await chrome.debugger.sendCommand(
+                { tabId },
+                'Network.getResponseBody',
+                { requestId: params.requestId }
+              );
+
+              let body = bodyResult.base64Encoded
+                ? atob(bodyResult.body)
+                : bodyResult.body;
+
+              // Truncate if too large
+              if (body && body.length > MAX_BODY_SIZE) {
+                body = body.substring(0, MAX_BODY_SIZE);
+                finishedRequest.response.bodyTruncated = true;
+              }
+
+              finishedRequest.response.body = body;
+            } catch (e) {
+              // Body may not be available (streaming, errors, etc.)
+            }
+          }
+        }
+
+        // Now send the complete request data to MCP server
+        sendToMcpServer('network', finishedRequest);
       }
       break;
 
